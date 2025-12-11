@@ -1,7 +1,7 @@
 {
-  "url": "https://teleton-miniapp.vercel.app/,
+  "url": "https://teleton-miniapp.vercel.app",
   "name": "TeleTon Token Factory",
-  "iconUrl": "logo.png",
-  "termsOfUseUrl": "",
-  "privacyPolicyUrl": ""
+  "iconUrl": "https://teleton-miniapp.vercel.app/logo.png",
+  "termsOfUseUrl": "https://teleton-miniapp.vercel.app",
+  "privacyPolicyUrl": "https://teleton-miniapp.vercel.app"
 }
