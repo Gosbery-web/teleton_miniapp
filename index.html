@@ -12,7 +12,6 @@
     <!-- TonConnect UI -->
     <script src="https://unpkg.com/@tonconnect/ui@2.3.1/dist/tonconnect-ui.min.js"></script>
 </head>
-
 <body>
 
     <div class="container">
@@ -22,7 +21,7 @@
             <img src="logo.png" alt="TeleTon Logo" class="logo">
         </div>
 
-        <!-- Приветствие от mini app -->
+        <!-- Приветствие -->
         <p class="description" id="greeting">Загрузка TeleTon…</p>
 
         <!-- КНОПКИ -->
@@ -34,82 +33,99 @@
 
     </div>
 
-<script>
-    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    <script>
+        // Telegram WebApp объект (если открыто внутри Telegram)
+        const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
 
-    // ИНИЦИАЛИЗАЦИЯ TON CONNECT UI
-    // ВАЖНО: тут тот же URL, что в tonconnect-manifest.json + /tonconnect-manifest.json
-    const tonConnectUI = new TonConnectUI.TonConnectUI({
-        manifestUrl: 'https://teleton-miniapp.vercel.app/tonconnect-manifest.json'
-    });
-
-    function initTeleTon() {
-        const greetingEl = document.getElementById('greeting');
-        const btnConnect = document.getElementById('btn-connect-wallet');
-
-        // === Telegram WebApp часть ===
-        if (tg) {
-            tg.ready();
-            tg.expand();
-
-            const user = tg.initDataUnsafe?.user;
-            if (user) {
-                const name = user.first_name || "друг";
-                greetingEl.textContent = `Привет, ${name}! Добро пожаловать в TeleTon Token Factory 👋`;
-            } else {
-                greetingEl.textContent = "Добро пожаловать в TeleTon Token Factory 👋";
-            }
-
-            const theme = tg.colorScheme; // light / dark
-            document.body.dataset.theme = theme;
-        } else {
-            greetingEl.textContent = "TeleTon Mini App (режим предпросмотра вне Telegram)";
+        // TonConnect UI (через CDN)
+        let tonConnectUI = null;
+        if (window.TON_CONNECT_UI) {
+            tonConnectUI = new TON_CONNECT_UI.TonConnectUI({
+                manifestUrl: 'https://teleton-miniapp.vercel.app/tonconnect-manifest.json'
+            });
         }
 
-        // === Подписка на статус TON-кошелька ===
-        tonConnectUI.onStatusChange((wallet) => {
-            if (wallet) {
-                // подключен
-                const address = wallet.account.address;
-                const short = address.slice(0, 4) + "..." + address.slice(-4);
-                btnConnect.textContent = `Кошелёк: ${short}`;
-                btnConnect.classList.add('connected');
-            } else {
-                // отключен
-                btnConnect.textContent = "Подключить TON-кошелёк";
-                btnConnect.classList.remove('connected');
-            }
-        });
+        function initTeleTon() {
+            const greetingEl = document.getElementById('greeting');
+            const btnConnect = document.getElementById('btn-connect-wallet');
+            const btnCreate = document.getElementById('btn-create-token');
+            const btnMyTokens = document.getElementById('btn-my-tokens');
 
-        // === Кнопка "Подключить TON-кошелёк" ===
-        btnConnect.addEventListener('click', async () => {
-            try {
-                await tonConnectUI.openModal(); // откроет модал с выбором кошелька
-            } catch (e) {
-                if (tg) {
-                    tg.showAlert("Не удалось открыть окно подключения кошелька 😔");
+            // === Telegram WebApp часть ===
+            if (tg) {
+                tg.ready();
+                tg.expand(); // раскрыть mini app по высоте
+
+                const user = tg.initDataUnsafe?.user;
+                if (user) {
+                    const name = user.first_name || "друг";
+                    greetingEl.textContent = `Привет, ${name}! Добро пожаловать в TeleTon Token Factory 👋`;
                 } else {
-                    alert("Не удалось открыть окно подключения кошелька 😔");
+                    greetingEl.textContent = "Добро пожаловать в TeleTon Token Factory 👋";
                 }
+
+                const theme = tg.colorScheme; // "light" или "dark"
+                document.body.dataset.theme = theme;
+            } else {
+                // если открыто не из Telegram
+                greetingEl.textContent = "TeleTon Mini App (режим предпросмотра вне Telegram)";
             }
-        });
 
-        // Остальные кнопки пока заглушки
-        document.getElementById('btn-create-token').addEventListener('click', () => {
-            if (tg) tg.showAlert("Экран создания токена добавим следующим шагом 😉");
-            else alert("Экран создания токена добавим следующим шагом 😉");
-        });
+            // === Подписка на изменение статуса кошелька ===
+            if (tonConnectUI) {
+                tonConnectUI.onStatusChange((wallet) => {
+                    if (wallet) {
+                        // кошелёк подключен
+                        const address = wallet.account.address;
+                        const short = address.slice(0, 4) + "..." + address.slice(-4);
+                        btnConnect.textContent = `Кошелёк: ${short}`;
+                        btnConnect.classList.add('connected');
+                    } else {
+                        // кошелёк отключен
+                        btnConnect.textContent = "Подключить TON-кошелёк";
+                        btnConnect.classList.remove('connected');
+                    }
+                });
+            }
 
-        document.getElementById('btn-my-tokens').addEventListener('click', () => {
-            if (tg) tg.showAlert("Здесь будет список твоих токенов и проектов 📊");
-            else alert("Здесь будет список твоих токенов и проектов 📊");
-        });
-    }
+            // === Кнопка "Подключить TON-кошелёк" ===
+            btnConnect.addEventListener('click', async () => {
+                if (!tonConnectUI) {
+                    if (tg) tg.showAlert("TON Connect UI не загрузился. Попробуй обновить страницу 🙃");
+                    else alert("TON Connect UI не загрузился. Попробуй обновить страницу 🙃");
+                    return;
+                }
 
-    document.addEventListener('DOMContentLoaded', initTeleTon);
-</script>
+                try {
+                    await tonConnectUI.openModal(); // открыть окно выбора кошелька
+                } catch (e) {
+                    console.error(e);
+                    if (tg) tg.showAlert("Не удалось открыть окно подключения кошелька 😔");
+                    else alert("Не удалось открыть окно подключения кошелька 😔");
+                }
+            });
 
+            // === Кнопка "Создать токен" ===
+            btnCreate.addEventListener('click', () => {
+                if (tg) {
+                    tg.showAlert("Экран создания токена добавим следующим шагом 😉");
+                } else {
+                    alert("Экран создания токена добавим следующим шагом 😉");
+                }
+            });
+
+            // === Кнопка "Мои токены / проекты" ===
+            btnMyTokens.addEventListener('click', () => {
+                if (tg) {
+                    tg.showAlert("Здесь будет список твоих токенов и проектов 📊");
+                } else {
+                    alert("Здесь будет список твоих токенов и проектов 📊");
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initTeleTon);
+    </script>
 
 </body>
 </html>
-
