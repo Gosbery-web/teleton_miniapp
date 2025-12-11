@@ -1,3 +1,5 @@
+/* === БАЗА === */
+
 body {
     margin: 0;
     padding: 0;
@@ -9,6 +11,12 @@ body {
     color: #0a3a75;
 }
 
+body[data-theme="dark"] {
+    background: #0c1b33;
+    background-image: url('bg.png');
+    color: #ffffff;
+}
+
 .container {
     max-width: 380px;
     margin: auto;
@@ -16,16 +24,21 @@ body {
     text-align: center;
 }
 
+
+/* === ЛОГО === */
+
 .logo-block {
     margin-top: 20px;
 }
 
 .logo {
-    width: 45%;
-    max-width: 220px;
+    width: 160px;
     opacity: 0.95;
+    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.15));
 }
 
+
+/* === ТЕКСТ === */
 
 .title {
     margin: 10px 0 0;
@@ -45,11 +58,14 @@ body {
 
 .description {
     margin-top: 20px;
-    font-size: 16px;
-    opacity: 0.85;
+    font-size: 17px;
+    font-weight: 500;
+    opacity: 0.9;
 }
 
-/* КНОПКИ */
+
+/* === КНОПКИ === */
+
 .buttons {
     margin-top: 40px;
     display: flex;
@@ -63,9 +79,14 @@ body {
     border-radius: 40px;
     border: none;
     font-size: 17px;
+    font-weight: 600;
     cursor: pointer;
     transition: 0.2s ease;
+    user-select: none;
 }
+
+
+/* --- СИНЯЯ КНОПКА (главная) --- */
 
 .primary {
     background: linear-gradient(180deg, #2a72ff, #005be0);
@@ -74,16 +95,52 @@ body {
 }
 
 .primary:hover {
-    box-shadow: 0 6px 15px rgba(0, 70, 200, 0.4);
+    box-shadow: 0 6px 18px rgba(0, 70, 200, 0.45);
 }
 
+
+/* --- ПРОЗРАЧНЫЕ КНОПКИ (второстепенные) --- */
+
 .secondary {
-    background: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.65);
     border: 2px solid rgba(0, 80, 170, 0.25);
     color: #09438f;
     backdrop-filter: blur(8px);
 }
 
 .secondary:hover {
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.85);
 }
+
+
+/* === КНОПКА: КОШЕЛЁК ПОДКЛЮЧЕН === */
+
+.btn.connected {
+    background: linear-gradient(180deg, #00c68c, #00a870);
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(0, 180, 120, 0.5);
+    border: none;
+}
+
+.btn.connected:hover {
+    box-shadow: 0 6px 18px rgba(0, 200, 140, 0.6);
+}
+
+
+/* === АДАПТИВ === */
+
+@media (max-width: 400px) {
+    .logo {
+        width: 140px;
+    }
+
+    .container {
+        padding: 30px 16px;
+    }
+
+    .btn {
+        font-size: 16px;
+        padding: 14px;
+    }
+}
+
